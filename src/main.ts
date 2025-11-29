@@ -3,6 +3,11 @@ import { AppModule } from './app.module';
 import { FakeDatabase } from './data/db';
 import { SwaggerModule } from '@nestjs/swagger';
 import * as YAML from 'yamljs';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+
+const port = process.env.PORT || 4000;
 
 export const db = new FakeDatabase();
 
@@ -13,6 +18,6 @@ async function bootstrap() {
 
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(4000);
+  await app.listen(port);
 }
 bootstrap();

@@ -11,7 +11,7 @@ import {
   IUser,
   IFavorites,
 } from 'src/types';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 
 export class FakeDatabase {
   private users: IUser[];
@@ -70,7 +70,7 @@ export class FakeDatabase {
   createUser(userDto: ICreateUserDto) {
     const newUser: IUser = {
       ...userDto,
-      id: uuidv4(),
+      id: randomUUID(),
       version: 1,
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -82,7 +82,7 @@ export class FakeDatabase {
   createArtist(artistDto: ICreateArtistDto) {
     const newArtist: IArtist = {
       ...artistDto,
-      id: uuidv4(),
+      id: randomUUID(),
     };
     this.artists.push(newArtist);
     return newArtist;
@@ -91,7 +91,7 @@ export class FakeDatabase {
   createAlbum(albumDto: ICreateAlbumDto) {
     const newAlbum: IAlbum = {
       ...albumDto,
-      id: uuidv4(),
+      id: randomUUID(),
     };
     this.albums.push(newAlbum);
     return newAlbum;
@@ -100,7 +100,7 @@ export class FakeDatabase {
   createTrack(teackDto: ICreateTrackDto) {
     const newTrack: ITrack = {
       ...teackDto,
-      id: uuidv4(),
+      id: randomUUID(),
     };
     this.tracks.push(newTrack);
     return newTrack;
