@@ -31,8 +31,6 @@ export class FakeDatabase {
     this.tracks = [];
   }
 
-  //GET
-
   getUsers() {
     return this.users;
   }
@@ -48,8 +46,6 @@ export class FakeDatabase {
   getTracks() {
     return this.tracks;
   }
-
-  // GET by Id
 
   getUserById(id: string) {
     const user = this.users.find((user) => user.id === id);
@@ -70,8 +66,6 @@ export class FakeDatabase {
     const track = this.tracks.find((track) => track.id === id);
     return track;
   }
-
-  // CREATE
 
   createUser(userDto: ICreateUserDto) {
     const newUser: IUser = {
@@ -111,8 +105,6 @@ export class FakeDatabase {
     this.tracks.push(newTrack);
     return newTrack;
   }
-
-  // UPDATE
 
   updateUser(id: string, userDto: IUpdatePasswordDto) {
     const existingUserIndex = this.users.findIndex((user) => user.id === id);
@@ -192,7 +184,6 @@ export class FakeDatabase {
     return this.tracks[existingTrackIndex];
   }
 
-  // DELETE
   deleteUser(id: string) {
     const existingUser = this.users.find((user) => user.id === id);
 
@@ -214,8 +205,6 @@ export class FakeDatabase {
 
     this.artists = this.artists.filter((artist) => artist.id !== id);
 
-    //set album.artistId to null
-
     const albumsWithArtist = this.albums.filter(
       (album) => album.artistId === deletingArtist.id,
     );
@@ -226,8 +215,6 @@ export class FakeDatabase {
         artistId: null,
       }),
     );
-
-    //set track.artistId to null after deletion
 
     const tracksWithArtist = this.tracks.filter(
       (track) => track.artistId === deletingArtist.id,
@@ -240,7 +227,6 @@ export class FakeDatabase {
       }),
     );
 
-    // cleanup favorites
     this.favorites.artists = this.favorites.artists.filter(
       (id) => id !== deletingArtist.id,
     );
@@ -257,8 +243,6 @@ export class FakeDatabase {
 
     this.albums = this.albums.filter((album) => album.id !== id);
 
-    //set track.albumId to null after deletion
-
     const tracksReferringtoThisAlbum = this.tracks.filter(
       (track) => track.albumId === deletingAlbum.id,
     );
@@ -270,7 +254,6 @@ export class FakeDatabase {
       }),
     );
 
-    // cleanup favorites
     this.favorites.albums = this.favorites.albums.filter(
       (id) => id !== deletingAlbum.id,
     );
@@ -287,7 +270,6 @@ export class FakeDatabase {
 
     this.tracks = this.tracks.filter((track) => track.id !== id);
 
-    // cleanup favorites
     this.favorites.tracks = this.favorites.tracks.filter(
       (id) => id !== deletingTrack.id,
     );
@@ -295,8 +277,6 @@ export class FakeDatabase {
     return deletingTrack;
   }
 
-  // FAVORITES
-  // Favs - Add
   addFavoriteTrack(id: string) {
     if (
       !this.favorites.tracks.includes(id) &&
@@ -324,7 +304,6 @@ export class FakeDatabase {
     }
   }
 
-  // Favs - remove
   removeFavoriteTrack(id: string) {
     const favTrackId = this.favorites.tracks.find((trackId) => trackId === id);
 
@@ -369,8 +348,6 @@ export class FakeDatabase {
 
     return favArtistId;
   }
-
-  // Favs - getAll Favs
 
   getAllFavs() {
     const tracks: ITrack[] = this.favorites.tracks.map((id) =>

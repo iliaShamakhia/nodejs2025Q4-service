@@ -55,8 +55,6 @@ export class FavoritesService {
     db.addFavoriteArtist(id);
   }
 
-  // REMOVE
-
   removeFavTrack(id: string) {
     if (!isValidUUID(id)) {
       throw new BadRequestException('Invalid id');

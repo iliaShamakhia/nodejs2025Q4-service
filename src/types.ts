@@ -8,7 +8,7 @@ export interface IUser {
 }
 
 export interface IArtist {
-  id: string; // uuid v4
+  id: string;
   name: string;
   grammy: boolean;
 }
