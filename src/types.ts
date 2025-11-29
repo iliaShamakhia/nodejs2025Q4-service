@@ -53,3 +53,9 @@ export interface ICreateArtistDto {
   name: string;
   grammy: boolean;
 }
+
+export interface ICreateAlbumDto {
+  name: string;
+  year: number;
+  artistId: string | null;
+}
