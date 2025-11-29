@@ -48,3 +48,8 @@ export enum ErrorMessages {
   SAME_PASSWORD = 'SAME_PASSWORD',
   WRONG_PASSWORD = 'WRONG_PASSWORD',
 }
+
+export interface ICreateArtistDto {
+  name: string;
+  grammy: boolean;
+}
