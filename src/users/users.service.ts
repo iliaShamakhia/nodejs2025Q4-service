@@ -70,7 +70,8 @@ export class UsersService {
       throw new ForbiddenException('Forbidden - wrong old password');
     }
 
-    const { password, ...user } = dbResponse;
+    const { ...user } = dbResponse;
+    delete user.password;
     return user;
   }
 
