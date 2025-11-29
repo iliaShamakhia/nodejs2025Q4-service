@@ -19,7 +19,7 @@ export class UsersService {
     if (!login || !password) {
       throw new BadRequestException('Invalid data to create user');
     }
-    const { password: pswd, ...user } = db.createUser(createUserDto);
+    const { ...user } = db.createUser(createUserDto);
     return user;
   }
 
@@ -69,7 +69,7 @@ export class UsersService {
       throw new ForbiddenException('Forbidden - wrong old password');
     }
 
-    const { password: pswd, ...user } = dbResponse;
+    const { ...user } = dbResponse;
     return user;
   }
 

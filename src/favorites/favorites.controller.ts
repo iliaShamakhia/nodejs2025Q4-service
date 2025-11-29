@@ -10,8 +10,6 @@ export class FavoritesController {
     return this.favoritesService.findAll();
   }
 
-  //POST
-
   @Post('track/:id')
   createFavTrack(@Param('id') id: string) {
     return this.favoritesService.createFavTrack(id);
@@ -26,8 +24,6 @@ export class FavoritesController {
   createFavArtist(@Param('id') id: string) {
     return this.favoritesService.createFavArtist(id);
   }
-
-  // DELETE
 
   @Delete('track/:id')
   @HttpCode(204)
