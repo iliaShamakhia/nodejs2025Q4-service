@@ -1,0 +1,7 @@
+FROM postgres:latest
+
+ENV POSTGRES_DB=homeLibraryServiceDb
+ENV POSTGRES_USER=iliaShamakhia
+ENV POSTGRES_PASSWORD=superSecretPassword123!
+
+EXPOSE 5432
