@@ -6,12 +6,16 @@ import {
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { isValidArtistId, isValidUUID } from 'src/utils';
-import { db } from '../main';
+import { db } from 'src/main';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class TracksService {
-  create(createTrackDto: CreateTrackDto) {
+  constructor(private prisma: PrismaService) {}
+
+  async create(createTrackDto: CreateTrackDto) {
     const { name, duration, albumId, artistId } = createTrackDto;
+
     if (
       !name ||
       !duration ||
@@ -21,29 +25,30 @@ export class TracksService {
       throw new BadRequestException('Invalid data to create track');
     }
 
-    const track = db.createTrack(createTrackDto);
+    const track = await this.prisma.track.create({ data: createTrackDto });
     return track;
   }
 
-  findAll() {
-    return db.getTracks();
+  async findAll() {
+    return await this.prisma.track.findMany();
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     if (!isValidUUID(id)) {
-      throw new BadRequestException('Invalid id');
+      throw new BadRequestException('Invalid track id');
     }
 
-    const track = db.getTrackById(id);
-
-    if (!track) {
-      throw new NotFoundException(`Track with id ${id} not found`);
+    try {
+      const track = await this.prisma.track.findUniqueOrThrow({
+        where: { id },
+      });
+      return track;
+    } catch (error) {
+      throw new NotFoundException(`Track with id ${id} not found`, error);
     }
-
-    return track;
   }
 
-  update(id: string, updateTrackDto: UpdateTrackDto) {
+  async update(id: string, updateTrackDto: UpdateTrackDto) {
     const { name, duration, albumId, artistId } = updateTrackDto;
 
     if (!isValidUUID(id)) {
@@ -58,26 +63,28 @@ export class TracksService {
       throw new BadRequestException('Invalid data to update track');
     }
 
-    const updatedTrack = db.updateTrack(id, updateTrackDto);
-
-    if (!updatedTrack) {
-      throw new NotFoundException('Updating track not found');
+    const existingTrack = await this.prisma.track.findUnique({ where: { id } });
+    if (!existingTrack) {
+      throw new NotFoundException(`Updating track with id ${id} not found`);
     }
 
+    const updatedTrack = await this.prisma.track.update({
+      where: { id },
+      data: updateTrackDto,
+    });
     return updatedTrack;
   }
 
-  remove(id: string) {
+  async remove(id: string) {
     if (!isValidUUID(id)) {
       throw new BadRequestException('Invalid id');
     }
 
-    const track = db.deleteTrack(id);
-
-    if (!track) {
-      throw new NotFoundException('Deleting track not found');
+    try {
+      const deletedTrack = await this.prisma.track.delete({ where: { id } });
+      return deletedTrack;
+    } catch (error) {
+      throw new NotFoundException(`Deleting track with ${id} not found`);
     }
-
-    return track;
   }
 }

@@ -66,3 +66,9 @@ export interface ICreateTrackDto {
   albumId: string | null;
   duration: number;
 }
+
+export type ReturnedUser = Omit<IUser, 'password'>;
+
+export interface BigInt {
+  toJSON(): string;
+}

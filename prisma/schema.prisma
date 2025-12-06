@@ -10,11 +10,11 @@ generator client {
 
 model User {
   id String @id @default(uuid()) @db.Uuid
-  login String @unique
+  login String
   password String
   version Int 
-  createdAt Int
-  updatedAt Int
+  createdAt BigInt
+  updatedAt BigInt
   favorites Favorites[]
 }
 
@@ -32,8 +32,8 @@ model Album {
   id String @id @default(uuid()) @db.Uuid
   name String
   year Int
-  artist Artist? @relation(fields: [artistId], references: [id])
-  artistId String? 
+  artist Artist? @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  artistId String? @db.Uuid
   tracks    Track[]
   favorites Favorites[]
 }
@@ -41,18 +41,18 @@ model Album {
 model Track {
   id String @id @default(uuid()) @db.Uuid
   name String
-  artist      Artist?  @relation(fields: [artistId], references: [id])
-  artistId String?
-  album Album? @relation(fields: [albumId], references: [id])
-  albumId String?
+  artist      Artist?  @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  artistId String? @db.Uuid
+  album Album? @relation(fields: [albumId], references: [id], onDelete: SetNull)
+  albumId String? @db.Uuid
   duration Int
   favorites Favorites[]
 }
 
 model Favorites {
   id      String   @id @default(uuid()) @db.Uuid
-  user    User     @relation(fields: [userId], references: [id])
-  userId  String
+  user    User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  String @db.Uuid
   artists Artist[]
   albums  Album[]
   tracks  Track[]

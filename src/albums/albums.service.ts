@@ -6,39 +6,42 @@ import {
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { isValidArtistId, isValidUUID } from 'src/utils';
-import { db } from '../main';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class AlbumsService {
-  create(createAlbumDto: CreateAlbumDto) {
+  constructor(private prisma: PrismaService) {}
+
+  async create(createAlbumDto: CreateAlbumDto) {
     const { name, year, artistId } = createAlbumDto;
 
     if (!name || !year || !isValidArtistId(artistId)) {
       throw new BadRequestException('Invalid data to create album');
     }
-    const album = db.createAlbum(createAlbumDto);
+    const album = await this.prisma.album.create({ data: createAlbumDto });
     return album;
   }
 
-  findAll() {
-    return db.getAlbums();
+  async findAll() {
+    return await this.prisma.album.findMany();
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     if (!isValidUUID(id)) {
       throw new BadRequestException('Invalid id');
     }
 
-    const album = db.getAlbumById(id);
-
-    if (!album) {
+    try {
+      const album = await this.prisma.album.findUniqueOrThrow({
+        where: { id },
+      });
+      return album;
+    } catch (error) {
       throw new NotFoundException(`Album with id ${id} not found`);
     }
-
-    return album;
   }
 
-  update(id: string, updateAlbumDto: UpdateAlbumDto) {
+  async update(id: string, updateAlbumDto: UpdateAlbumDto) {
     const { name, year, artistId } = updateAlbumDto;
 
     if (!isValidUUID(id)) {
@@ -49,26 +52,39 @@ export class AlbumsService {
       throw new BadRequestException('Invalid data to update album');
     }
 
-    const updatedAlbum = db.updateAlbum(id, updateAlbumDto);
-
-    if (!updatedAlbum) {
-      throw new NotFoundException('Updating album not found');
+    try {
+      await this.prisma.album.findUniqueOrThrow({
+        where: { id },
+      });
+    } catch (error) {
+      throw new NotFoundException(`Updating album with id ${id} not found`);
     }
 
-    return updatedAlbum;
+    try {
+      const updatedAlbum = await this.prisma.album.update({
+        where: { id },
+        data: updateAlbumDto,
+      });
+
+      return updatedAlbum;
+    } catch (error) {
+      throw new BadRequestException(
+        'Something went wrong when update Album',
+        error,
+      );
+    }
   }
 
-  remove(id: string) {
+  async remove(id: string) {
     if (!isValidUUID(id)) {
-      throw new BadRequestException('Invalid id');
+      throw new BadRequestException('Invalid album id');
     }
 
-    const album = db.deleteAlbum(id);
-
-    if (!album) {
-      throw new NotFoundException('Deleting album not found');
+    try {
+      const removedAlbum = await this.prisma.album.delete({ where: { id } });
+      return removedAlbum;
+    } catch (error) {
+      throw new NotFoundException(`Deleting album with id ${id} not found`);
     }
-
-    return album;
   }
 }
