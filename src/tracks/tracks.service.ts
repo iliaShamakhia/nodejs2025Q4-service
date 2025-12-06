@@ -6,7 +6,6 @@ import {
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { isValidArtistId, isValidUUID } from 'src/utils';
-import { db } from 'src/main';
 import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()

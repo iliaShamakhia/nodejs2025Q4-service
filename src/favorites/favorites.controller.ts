@@ -12,17 +12,17 @@ export class FavoritesController {
 
   @Post('track/:id')
   createFavTrack(@Param('id') id: string) {
-    return this.favoritesService.createFavTrack(id);
+    return this.favoritesService.addFavArtist(id);
   }
 
   @Post('album/:id')
   createFavAlbum(@Param('id') id: string) {
-    return this.favoritesService.createFavAlbum(id);
+    return this.favoritesService.addFavArtist(id);
   }
 
   @Post('artist/:id')
   createFavArtist(@Param('id') id: string) {
-    return this.favoritesService.createFavArtist(id);
+    return this.favoritesService.addFavArtist(id);
   }
 
   @Delete('track/:id')
