@@ -4,12 +4,16 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { prisma } from 'prisma/prisma.service';
 import { isValidUUID } from 'src/utils';
 
 @Injectable()
 export class FavoritesService {
-  constructor(private prisma: PrismaService) {}
+  private prisma;
+  
+  constructor() {
+    this.prisma = prisma;
+  }
 
   async createUserIfNotExists() {
     // we have no auth yet so lets create a user to add favorites to

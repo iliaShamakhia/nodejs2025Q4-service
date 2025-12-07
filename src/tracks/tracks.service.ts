@@ -6,11 +6,15 @@ import {
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { isValidArtistId, isValidUUID } from 'src/utils';
-import { PrismaService } from 'prisma/prisma.service';
+import { prisma } from 'prisma/prisma.service';
 
 @Injectable()
 export class TracksService {
-  constructor(private prisma: PrismaService) {}
+  private prisma;
+  
+  constructor() {
+    this.prisma = prisma;
+  }
 
   async create(createTrackDto: CreateTrackDto) {
     const { name, duration, albumId, artistId } = createTrackDto;

@@ -8,11 +8,15 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { isValidUUID, thinObjectOut } from 'src/utils';
 import { ReturnedUser } from 'src/types';
-import { PrismaService } from 'prisma/prisma.service';
+import { prisma } from 'prisma/prisma.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  private prisma;
+  
+  constructor() {
+    this.prisma = prisma;
+  }
 
   async create(createUserDto: CreateUserDto) {
     const { login, password } = createUserDto;

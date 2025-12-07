@@ -6,11 +6,15 @@ import {
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { isValidArtistId, isValidUUID } from 'src/utils';
-import { PrismaService } from 'prisma/prisma.service';
+import { prisma } from 'prisma/prisma.service';
 
 @Injectable()
 export class AlbumsService {
-  constructor(private prisma: PrismaService) {}
+  private prisma;
+  
+  constructor() {
+    this.prisma = prisma;
+  }
 
   async create(createAlbumDto: CreateAlbumDto) {
     const { name, year, artistId } = createAlbumDto;

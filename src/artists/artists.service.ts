@@ -7,11 +7,15 @@ import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { isValidUUID } from 'src/utils';
 import { isBoolean } from 'class-validator';
-import { PrismaService } from 'prisma/prisma.service';
+import { prisma } from 'prisma/prisma.service';
 
 @Injectable()
 export class ArtistsService {
-  constructor(private prisma: PrismaService) {}
+  private prisma;
+  
+  constructor() {
+    this.prisma = prisma;
+  }
 
   async create(createArtistDto: CreateArtistDto) {
     const { name, grammy } = createArtistDto;

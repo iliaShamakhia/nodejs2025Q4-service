@@ -1,47 +1,50 @@
-version: '3.8'
-
 services:
-  db_postgres:
-    container_name: postgres-container
-    restart: always
+  db:
     build:
       context: .
       dockerfile: Dockerfile.postgres
+    #image: ${DOCKERHUB_USERNAME:-local}/home-library-db:latest
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      ports:
-       - '5432:5432'
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     networks:
-      - app-network
+      - home-library-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   app:
-    container_name: nest-app
-    restart: always
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - '4000:4000'
-    environment:
-      DB_NAME: ${POSTGRES_DB}
-      DB_USER: ${POSTGRES_USER}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_PORT: ${POSTGRES_PORT}
-      DATABASE_URL: ${DATABASE_URL}
+    #image: ${DOCKERHUB_USERNAME:-local}/home-library-app:latest
+    env_file:
+      - .env
     depends_on:
-      - db_postgres
-    networks:
-      - app-network
+      db:
+        condition: service_healthy
+    ports:
+      - 4000:4000
+    # For development: bind mount to enable restart on src changes and use nest's watch
     volumes:
-      - ./src:/app/src
-
-volumes:
-  pgdata:
+      - ./:/usr/src/app:cached
+      - /usr/src/app/node_modules
+    command: sh -c "npx prisma generate && npx prisma migrate deploy || true; npm run start:dev"
+    networks:
+      - home-library-net
+    restart: on-failure
 
 networks:
-  app-network:
+  home-library-net:
     driver: bridge
+
+volumes:
+  postgres_data: {}

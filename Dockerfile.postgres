@@ -1,7 +1,9 @@
-FROM postgres:latest
+FROM postgres:15-alpine
 
-ENV POSTGRES_DB=homeLibraryServiceDb
-ENV POSTGRES_USER=testUsername
-ENV POSTGRES_PASSWORD=superSecretPassword123!
+ENV POSTGRES_DB=home_library
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=postgres
+
+VOLUME ["/var/lib/postgresql/data"]
 
 EXPOSE 5432
