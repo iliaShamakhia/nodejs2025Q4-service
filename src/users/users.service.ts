@@ -20,30 +20,40 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    const { login, password } = createUserDto;
-    if (!login || !password) {
-      this.logger.error(`400 - Invalid data to create user: ${createUserDto}`);
-      throw new BadRequestException('Invalid data to create user');
+    try {
+      const { login, password } = createUserDto;
+      if (!login || !password) {
+        this.logger.error(
+          `400 - Invalid data to create user: ${createUserDto}`,
+        );
+        throw new BadRequestException(
+          `Invalid data to create user: ${createUserDto}`,
+        );
+      }
+      const creationTime = Date.now();
+
+      const user = await this.prisma.user.create({
+        data: {
+          ...createUserDto,
+          createdAt: creationTime,
+          updatedAt: creationTime,
+          version: 1,
+        },
+      });
+
+      let userWithoutPassword = thinObjectOut(user, [
+        'password',
+      ]) as ReturnedUser;
+
+      userWithoutPassword = {
+        ...userWithoutPassword,
+        createdAt: Number(userWithoutPassword.createdAt),
+        updatedAt: Number(userWithoutPassword.updatedAt),
+      };
+      return userWithoutPassword;
+    } catch (error) {
+      throw error;;
     }
-    const creationTime = Date.now();
-
-    const user = await this.prisma.user.create({
-      data: {
-        ...createUserDto,
-        createdAt: creationTime,
-        updatedAt: creationTime,
-        version: 1,
-      },
-    });
-
-    let userWithoutPassword = thinObjectOut(user, ['password']) as ReturnedUser;
-
-    userWithoutPassword = {
-      ...userWithoutPassword,
-      createdAt: Number(userWithoutPassword.createdAt),
-      updatedAt: Number(userWithoutPassword.updatedAt),
-    };
-    return userWithoutPassword;
   }
 
   async findAll() {

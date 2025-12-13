@@ -4,6 +4,7 @@ import { SwaggerModule } from '@nestjs/swagger';
 import * as YAML from 'yamljs';
 import * as dotenv from 'dotenv';
 import { LoggingService } from './logging/logging.service';
+import { CustomHttpExceptionFilter } from './http-exception.filter';
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
+  app.useGlobalFilters(new CustomHttpExceptionFilter());
   app.useLogger(app.get(LoggingService));
 
   const document = YAML.load('doc/api.yaml');
