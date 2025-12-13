@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { SwaggerModule } from '@nestjs/swagger';
 import * as YAML from 'yamljs';
 import * as dotenv from 'dotenv';
-import { MyLoggerService } from './logging/logging.service';
+import { LoggingService } from './logging/logging.service';
 
 dotenv.config();
 
@@ -14,7 +14,7 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
-  app.useLogger(app.get(MyLoggerService));
+  app.useLogger(app.get(LoggingService));
 
   const document = YAML.load('doc/api.yaml');
 

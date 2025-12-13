@@ -1,18 +1,20 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { isValidArtistId, isValidUUID } from 'src/utils';
 import { prisma } from 'prisma/prisma.service';
+import { LoggingService } from 'src/logging/logging.service';
 
 @Injectable()
 export class TracksService {
   private prisma;
   
-  constructor() {
+  constructor(private logger: LoggingService) {
     this.prisma = prisma;
   }
 
@@ -25,6 +27,7 @@ export class TracksService {
       !isValidArtistId(artistId) ||
       !isValidArtistId(albumId)
     ) {
+      this.logger.error('400 - Invalid data to create track');
       throw new BadRequestException('Invalid data to create track');
     }
 
@@ -33,11 +36,17 @@ export class TracksService {
   }
 
   async findAll() {
-    return await this.prisma.track.findMany();
+    try {
+      return await this.prisma.track.findMany();
+    } catch (error) {
+      this.logger.error('500 - Internal Server Error');
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
 
   async findOne(id: string) {
     if (!isValidUUID(id)) {
+      this.logger.error('400 - Invalid track id', id);
       throw new BadRequestException('Invalid track id');
     }
 
@@ -47,7 +56,8 @@ export class TracksService {
       });
       return track;
     } catch (error) {
-      throw new NotFoundException(`Track with id ${id} not found`, error);
+      this.logger.warn(`404 - Track with id ${id} not found`);
+      throw new NotFoundException(`Track with id ${id} not found`);
     }
   }
 
@@ -55,6 +65,7 @@ export class TracksService {
     const { name, duration, albumId, artistId } = updateTrackDto;
 
     if (!isValidUUID(id)) {
+      this.logger.error('400 - Invalid track id', id);
       throw new BadRequestException('Invalid id');
     }
 
@@ -63,11 +74,13 @@ export class TracksService {
       !isValidArtistId(artistId) ||
       !isValidArtistId(albumId)
     ) {
+      this.logger.error('400 - Invalid data to update track', id);
       throw new BadRequestException('Invalid data to update track');
     }
 
     const existingTrack = await this.prisma.track.findUnique({ where: { id } });
     if (!existingTrack) {
+      this.logger.warn(`404 - Track with id ${id} not found`);
       throw new NotFoundException(`Updating track with id ${id} not found`);
     }
 
@@ -80,6 +93,7 @@ export class TracksService {
 
   async remove(id: string) {
     if (!isValidUUID(id)) {
+      this.logger.error(`400 - Invalid track id ${id}`);
       throw new BadRequestException('Invalid id');
     }
 
@@ -87,6 +101,7 @@ export class TracksService {
       const deletedTrack = await this.prisma.track.delete({ where: { id } });
       return deletedTrack;
     } catch (error) {
+      this.logger.warn(`404 - Deleting track with ${id} not found`);
       throw new NotFoundException(`Deleting track with ${id} not found`);
     }
   }

@@ -9,18 +9,20 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { isValidUUID, thinObjectOut } from 'src/utils';
 import { ReturnedUser } from 'src/types';
 import { prisma } from 'prisma/prisma.service';
+import { LoggingService } from 'src/logging/logging.service';
 
 @Injectable()
 export class UsersService {
   private prisma;
   
-  constructor() {
+  constructor(private logger: LoggingService) {
     this.prisma = prisma;
   }
 
   async create(createUserDto: CreateUserDto) {
     const { login, password } = createUserDto;
     if (!login || !password) {
+      this.logger.error(`400 - Invalid data to create user: ${createUserDto}`);
       throw new BadRequestException('Invalid data to create user');
     }
     const creationTime = Date.now();
@@ -45,17 +47,23 @@ export class UsersService {
   }
 
   async findAll() {
-    return await this.prisma.user.findMany();
+    try {
+      return await this.prisma.user.findMany();
+    } catch (error) {
+      this.logger.error(`500 - Internal Server Error`);
+    }
   }
 
   async findOne(id: string) {
     if (!isValidUUID(id)) {
+      this.logger.error(`400 - Invalid user id: ${id}`);
       throw new BadRequestException('Invalid id');
     }
 
     const user = await this.prisma.user.findUnique({ where: { id: id } });
 
     if (!user) {
+      this.logger.warn(`404 - User with id ${id} not found`);
       throw new NotFoundException(`User with id ${id} not found`);
     }
 
@@ -66,10 +74,12 @@ export class UsersService {
     const { newPassword, oldPassword } = updateUserDto;
 
     if (!isValidUUID(id)) {
+      this.logger.error(`400 - Invalid user id: ${id}`);
       throw new BadRequestException('Invalid id');
     }
 
     if (!newPassword || !oldPassword) {
+      this.logger.error(`400 - Invalid data to update user`);
       throw new BadRequestException('Invalid data to update user');
     }
 
@@ -82,14 +92,17 @@ export class UsersService {
     });
 
     if (!existingUser) {
+      this.logger.warn(`404 - Updating user not found`);
       throw new NotFoundException('Updating user not found');
     }
 
     if (existingUser.password === updateUserDto.newPassword) {
+      this.logger.error(`403 - New password must be different`);
       throw new ForbiddenException('New password must be different');
     }
 
     if (existingUser.password !== updateUserDto.oldPassword) {
+      this.logger.error(`403 - Forbidden - wrong old password`);
       throw new ForbiddenException('Forbidden - wrong old password');
     }
 
@@ -114,6 +127,7 @@ export class UsersService {
 
   async remove(id: string) {
     if (!isValidUUID(id)) {
+      this.logger.error(`400 - Invalid user id ${id}`);
       throw new BadRequestException('Invalid id');
     }
 
@@ -121,6 +135,7 @@ export class UsersService {
       const user = await this.prisma.user.delete({ where: { id: id } });
       return user;
     } catch (error) {
+      this.logger.warn(`404 - Deleting user not found`);
       throw new NotFoundException('Deleting user not found');
     }
   }
