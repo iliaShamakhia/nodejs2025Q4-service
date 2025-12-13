@@ -72,3 +72,10 @@ export type ReturnedUser = Omit<IUser, 'password'>;
 export interface BigInt {
   toJSON(): string;
 }
+
+export interface SignInDto {
+  login: string;
+  password: string;
+}
+
+export const isString = (v: any) => typeof v === 'string';
