@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { LoggingService } from 'src/logging/logging.service';
 import { UsersService } from 'src/users/users.service';
 
 // TODO - add logger
@@ -16,15 +17,17 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private logger: LoggingService,
   ) {}
 
   async signUp(
     login: string,
     receivedPassword: string,
-  ): Promise<{ access_token: string; refresh_token: string }> {
+  ): Promise<{ id: string; accessToken: string; refreshToken: string }> {
     const existingUser = await this.usersService.findOnebyLogin(login);
     console.log('SIGN-UP', existingUser);
     if (existingUser) {
+      this.logger.warn('WARN', `Username with login "${login}" already exists`);
       throw new ConflictException(
         `Username with login "${login}" already exists`,
       );
@@ -39,6 +42,7 @@ export class AuthService {
       password: hashedPassword,
     });
 
+    // TODO - implement private method
     // "sub" and "username" by JWT conventions
     const payload = { userId: newUser.id, login: newUser.login };
 
@@ -52,13 +56,13 @@ export class AuthService {
       secret: process.env.JWT_SECRET_REFRESH_KEY,
     });
 
-    return { access_token: accessToken, refresh_token: refreshToken };
+    return { id: newUser.id, accessToken, refreshToken };
   }
 
   async signIn(
     login: string,
     receivedPassword: string,
-  ): Promise<{ access_token: string; refresh_token: string }> {
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const existingUser = await this.usersService.findOnebyLogin(login);
 
     if (!existingUser) {
@@ -87,9 +91,10 @@ export class AuthService {
       secret: process.env.JWT_SECRET_REFRESH_KEY,
     });
 
-    return { access_token: accessToken, refresh_token: refreshToken };
+    return { accessToken, refreshToken };
   }
 
+  // REFRESH
   async refresh(refreshToken: string) {
     try {
       // Verify the refresh token
@@ -120,7 +125,7 @@ export class AuthService {
         secret: process.env.JWT_SECRET_REFRESH_KEY,
       });
 
-      return { access_token: newAccessToken, refresh_token: newRefreshToken };
+      return { accessToken: newAccessToken, refreshToken: newRefreshToken };
     } catch (error) {
       // Handle token verification errors
       if (error.name === 'TokenExpiredError') {
