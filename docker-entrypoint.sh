@@ -10,4 +10,4 @@ fi
 
 # Start app
 echo "Starting app..."
-exec node dist/main
+exec npm start
