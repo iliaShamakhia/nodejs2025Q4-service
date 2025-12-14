@@ -56,7 +56,7 @@ export class AuthService {
       expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME,
       secret: process.env.JWT_SECRET_REFRESH_KEY,
     });
-
+    console.log(accessToken, ' ----- ',refreshToken)
     return { id: newUser.id, accessToken, refreshToken };
   }
 

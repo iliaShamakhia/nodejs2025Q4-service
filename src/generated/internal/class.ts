@@ -23,7 +23,7 @@ const config: runtime.GetPrismaClientConfig = {
       "value": "prisma-client"
     },
     "output": {
-      "value": "/usr/src/app/src/generated",
+      "value": "C:\\Users\\Ilia_Shamakhia\\Desktop\\nodejs2025Q4-service\\src\\generated",
       "fromEnvVar": null
     },
     "config": {
@@ -32,12 +32,12 @@ const config: runtime.GetPrismaClientConfig = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "linux-musl-openssl-3.0.x",
+        "value": "windows",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/usr/src/app/prisma/schema.prisma",
+    "sourceFilePath": "C:\\Users\\Ilia_Shamakhia\\Desktop\\nodejs2025Q4-service\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativePath": "../../prisma",
@@ -51,12 +51,12 @@ const config: runtime.GetPrismaClientConfig = {
     "db": {
       "url": {
         "fromEnvVar": null,
-        "value": "postgresql://postgres:postgres@db:5432/home_library?schema=public"
+        "value": "postgresql://postgres:postgres@localhost:5432/home_library?schema=public"
       }
     }
   },
-  "inlineSchema": "datasource db {\n  provider = \"postgresql\"\n  url      = \"postgresql://postgres:postgres@db:5432/home_library?schema=public\"\n}\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated\"\n}\n\nmodel User {\n  id        String @id @default(uuid()) @db.Uuid\n  login     String\n  password  String\n  version   Int\n  createdAt BigInt\n  updatedAt BigInt\n}\n\nmodel Artist {\n  id        String      @id @default(uuid()) @db.Uuid\n  name      String\n  grammy    Boolean\n  albums    Album[]\n  tracks    Track[]\n  favorites Favorites[]\n}\n\nmodel Album {\n  id        String      @id @default(uuid()) @db.Uuid\n  name      String\n  year      Int\n  artist    Artist?     @relation(fields: [artistId], references: [id], onDelete: SetNull)\n  artistId  String?     @db.Uuid\n  tracks    Track[]\n  favorites Favorites[]\n}\n\nmodel Track {\n  id        String      @id @default(uuid()) @db.Uuid\n  name      String\n  artist    Artist?     @relation(fields: [artistId], references: [id], onDelete: SetNull)\n  artistId  String?     @db.Uuid\n  album     Album?      @relation(fields: [albumId], references: [id], onDelete: SetNull)\n  albumId   String?     @db.Uuid\n  duration  Int\n  favorites Favorites[]\n}\n\nmodel Favorites {\n  id      String   @id @default(uuid()) @db.Uuid\n  artists Artist[]\n  albums  Album[]\n  tracks  Track[]\n}\n",
-  "inlineSchemaHash": "206f583212464371fd49dded7011f64f44276bc4bbfe9b56c598795a67576621",
+  "inlineSchema": "datasource db {\n  provider = \"postgresql\"\n  url      = \"postgresql://postgres:postgres@localhost:5432/home_library?schema=public\"\n}\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated\"\n}\n\nmodel User {\n  id        String @id @default(uuid()) @db.Uuid\n  login     String\n  password  String\n  version   Int\n  createdAt BigInt\n  updatedAt BigInt\n}\n\nmodel Artist {\n  id        String      @id @default(uuid()) @db.Uuid\n  name      String\n  grammy    Boolean\n  albums    Album[]\n  tracks    Track[]\n  favorites Favorites[]\n}\n\nmodel Album {\n  id        String      @id @default(uuid()) @db.Uuid\n  name      String\n  year      Int\n  artist    Artist?     @relation(fields: [artistId], references: [id], onDelete: SetNull)\n  artistId  String?     @db.Uuid\n  tracks    Track[]\n  favorites Favorites[]\n}\n\nmodel Track {\n  id        String      @id @default(uuid()) @db.Uuid\n  name      String\n  artist    Artist?     @relation(fields: [artistId], references: [id], onDelete: SetNull)\n  artistId  String?     @db.Uuid\n  album     Album?      @relation(fields: [albumId], references: [id], onDelete: SetNull)\n  albumId   String?     @db.Uuid\n  duration  Int\n  favorites Favorites[]\n}\n\nmodel Favorites {\n  id      String   @id @default(uuid()) @db.Uuid\n  artists Artist[]\n  albums  Album[]\n  tracks  Track[]\n}\n",
+  "inlineSchemaHash": "6f8390812b07af33d554bedc724a496f028dbbe6401e037293b14fd48a6febd3",
   "copyEngine": true,
   "runtimeDataModel": {
     "models": {},

@@ -80,11 +80,12 @@ export class UsersService {
     return user;
   }
 
-  async findOnebyLogin(login: string) {
-    const user = await this.prisma.user.findFirst({ where: { login } });
-
+  async findOnebyLogin(userLogin: string) {
+    console.log('enters findOneByLogin ', userLogin);
+    const user = await this.prisma.user.findFirst({ where: { login: userLogin }, });
+    console.log('finds user: ', user);
     if (!user) {
-      this.logger.warn(`404 - User with login ${login} not found`);
+      this.logger.warn(`404 - User with login ${userLogin} not found`);
       return null;
     }
 

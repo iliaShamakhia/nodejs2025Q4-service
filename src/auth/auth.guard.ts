@@ -14,7 +14,7 @@ export class AuthGuard implements CanActivate {
   constructor(private jwtService: JwtService, private reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    /* const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
@@ -23,12 +23,12 @@ export class AuthGuard implements CanActivate {
     if (isPublic || this.isSwaggerUiRoute(context)) {
       // 💡 No Authorization needed
       return true;
-    } */
+    }
 
     const request = context.switchToHttp().getRequest();
     const jwt_token = this.extractTokenFromHeader(request);
-console.log(request)
-console.log(jwt_token)
+/* console.log(request)
+console.log(jwt_token) */
     if (!jwt_token) {
         console.log('enters here')
       throw new UnauthorizedException('No Authorizatoion token found');

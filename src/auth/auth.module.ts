@@ -8,7 +8,7 @@ import { LoggingService } from 'src/logging/logging.service';
 import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [UsersModule, JwtModule.register({})],
+  imports: [UsersModule, JwtModule],
 
   controllers: [AuthController],
   providers: [
