@@ -37,7 +37,7 @@ export const favoritesRoutes = {
   tracks: (trackId) => `/favs/track/${trackId}`,
 };
 
-export const authRoutes = {
+export const authRoutes = { 
   signup: '/auth/signup',
   login: '/auth/login',
   refresh: '/auth/refresh',

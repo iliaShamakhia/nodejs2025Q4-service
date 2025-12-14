@@ -1,0 +1,60 @@
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres
+    #image: ${DOCKERHUB_USERNAME:-local}/home-library-db:latest
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    networks:
+      - home-library-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    #image: ${DOCKERHUB_USERNAME:-local}/home-library-app:latest
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - 4000:4000
+    environment:
+      CRYPT_SALT: ${CRYPT_SALT}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_SECRET_REFRESH_KEY: ${JWT_SECRET_REFRESH_KEY}
+      TOKEN_EXPIRE_TIME: ${TOKEN_EXPIRE_TIME}
+      TOKEN_REFRESH_EXPIRE_TIME: ${TOKEN_REFRESH_EXPIRE_TIME}
+      LOG_LEVEL: ${LOG_LEVEL}
+      MAX_LOG_FILE_SIZE_BYTES: ${MAX_LOG_FILE_SIZE_BYTES}
+    # For development: bind mount to enable restart on src changes and use nest's watch
+    volumes:
+      - ./:/usr/src/app:cached
+      - /usr/src/app/node_modules
+    command: sh -c "npx prisma generate && npx prisma migrate deploy || true; npm start"
+    networks:
+      - home-library-net
+    restart: on-failure
+
+networks:
+  home-library-net:
+    driver: bridge
+
+volumes:
+  postgres_data: {}
