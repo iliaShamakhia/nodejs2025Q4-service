@@ -27,10 +27,7 @@ export class AuthGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const jwt_token = this.extractTokenFromHeader(request);
-/* console.log(request)
-console.log(jwt_token) */
     if (!jwt_token) {
-        console.log('enters here')
       throw new UnauthorizedException('No Authorizatoion token found');
     }
 

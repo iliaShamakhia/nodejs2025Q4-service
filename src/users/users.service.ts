@@ -81,15 +81,19 @@ export class UsersService {
   }
 
   async findOnebyLogin(userLogin: string) {
-    console.log('enters findOneByLogin ', userLogin);
-    const user = await this.prisma.user.findFirst({ where: { login: userLogin }, });
-    console.log('finds user: ', user);
-    if (!user) {
+    let user;
+    try{
+      user = await this.prisma.user.findMany({ where: { login: userLogin }, });
+    }catch(e){
+      console.log('error: ',e)
+    }
+    
+    if (!user || user.length === 0) {
       this.logger.warn(`404 - User with login ${userLogin} not found`);
       return null;
     }
 
-    return user;
+    return user[0];
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {

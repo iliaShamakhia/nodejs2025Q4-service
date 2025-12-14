@@ -32,7 +32,6 @@ export class AuthController {
   @Post('signup')
   signUp(@Body() signInDto: SignInDto) {
     const { login, password } = signInDto;
-    console.log('signUp', signInDto);
     if (!login || !password || !isString(login) || !isString(password)) {
       throw new BadRequestException('Invalid login or/and password');
     }
@@ -45,7 +44,6 @@ export class AuthController {
   @Post('refresh')
   refresh(@Body() refreshDto: { refreshToken: string }) {
     const { refreshToken } = refreshDto;
-    console.log('controller --- refreshToken ----  ', refreshToken);
     if (!refreshToken || !isString(refreshToken)) {
       throw new UnauthorizedException('Refresh token not provided');
     }

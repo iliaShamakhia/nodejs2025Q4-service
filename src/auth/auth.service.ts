@@ -23,7 +23,6 @@ export class AuthService {
     receivedPassword: string,
   ): Promise<{ id: string; accessToken: string; refreshToken: string }> {
     const existingUser = await this.usersService.findOnebyLogin(login);
-    console.log('SIGN-UP', existingUser);
     if (existingUser) {
       this.logger.warn(
         'WARN',
@@ -37,12 +36,15 @@ export class AuthService {
     const salt = await bcrypt.genSalt(+process.env.CRYPT_SALT);
 
     const hashedPassword = await bcrypt.hash(receivedPassword, salt); // Adjust the salt rounds as needed
-
-    const newUser = await this.usersService.create({
+    let newUser;
+    try{
+      newUser = await this.usersService.create({
       login,
       password: hashedPassword,
     });
-
+    }catch(e){
+      console.log("user create error:", e)
+    }
     // TODO - implement private method
     // "sub" and "username" by JWT conventions
     const payload = { userId: newUser.id, login: newUser.login };
@@ -56,7 +58,6 @@ export class AuthService {
       expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME,
       secret: process.env.JWT_SECRET_REFRESH_KEY,
     });
-    console.log(accessToken, ' ----- ',refreshToken)
     return { id: newUser.id, accessToken, refreshToken };
   }
 
@@ -104,7 +105,6 @@ export class AuthService {
       const decodedToken = await this.jwtService.verifyAsync(refreshToken, {
         secret: process.env.JWT_SECRET_REFRESH_KEY,
       });
-      console.log({ decodedToken });
       // Extract the user ID from the decoded token
       const { userId, login } = decodedToken;
 

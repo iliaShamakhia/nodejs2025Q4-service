@@ -74,9 +74,6 @@ export class LoggingService implements LoggerService {
       this.logErrorsStream = createWriteStream(this.logErrorsFilePath, {
         flags: 'a',
       });
-      console.log(
-        `\x1b[35mErrors log file rotated. Previous file renamed to ${backupFileName}. New log file started.\x1b[0m`,
-      );
     } else {
       // Close the current log stream
       this.logStream.end();
